@@ -1,12 +1,16 @@
 #pragma once
 
-#include <format>
-#include <string>
+// Windows headers
+#include <stringapiset.h>
 #include <wtypes.h>
 
-namespace details
+// Standard C++ headers
+#include <format>
+#include <string>
+
+namespace taz::details
 {
-	std::string GetWindowTextString(HWND hwnd)
+	inline std::string GetWindowTextString(HWND hwnd)
 	{
 		auto windowTextLength = GetWindowTextLength(hwnd);
 		std::string windowText(windowTextLength + 1, '\0');
@@ -15,7 +19,7 @@ namespace details
 		return windowText;
 	}
 
-	std::string GetWindowClassNameString(HWND hwnd)
+	inline std::string GetWindowClassNameString(HWND hwnd)
 	{
 		std::string className(256, '\0');
 		auto classNameLength = GetClassNameA(hwnd, className.data(), static_cast<int32_t>(className.size()));
@@ -26,15 +30,10 @@ namespace details
 
 namespace std
 {
-	template <std::convertible_to<const wchar_t*> _Ty>
-	struct wide_to_narrow_formatter : _Formatter_base<_Ty, char, _Basic_format_arg_type::_Custom_type>
+	template<>
+	struct formatter<const wchar_t*, char> : _Formatter_base<const wchar_t*, char, _Basic_format_arg_type::_Custom_type>
 	{
-		constexpr auto parse(std::format_parse_context& ctx)
-		{
-			return ctx.begin();
-		}
-
-		auto format(_Ty input, std::format_context& ctx)
+		auto format(const wchar_t* input, std::format_context& ctx)
 		{
 			// Measure for the conversion to UTF-8
 			std::wstring_view inputString{ input };
@@ -49,14 +48,22 @@ namespace std
 		}
 	};
 
-	template <>
-	struct formatter<const wchar_t*, char> : wide_to_narrow_formatter<const wchar_t*>
+	template<>
+	struct formatter<const char*, wchar_t> : _Formatter_base<const char*, wchar_t, _Basic_format_arg_type::_Custom_type>
 	{
-	};
+		auto format(const char* input, std::wformat_context& ctx)
+		{
+			// Measure for the conversion to UTF-8
+			std::string_view inputString{ input };
+			auto bytesNeeded = MultiByteToWideChar(CP_UTF8, 0, inputString.data(), static_cast<int>(inputString.size()), nullptr, 0);
 
-	template <>
-	struct formatter<wchar_t*, char> : wide_to_narrow_formatter<wchar_t*>
-	{
+			// Convert to UTF-8
+			std::vector<wchar_t> output(bytesNeeded);
+			MultiByteToWideChar(CP_UTF8, 0, inputString.data(), static_cast<int>(inputString.size()), output.data(), bytesNeeded);
+
+			// Write it out
+			return std::copy(begin(output), end(output), ctx.out());
+		}
 	};
 
 	template <>
@@ -95,12 +102,12 @@ namespace std
 
 			if (m_showWindowText)
 			{
-				format_to(ctx.out(), " \"{}\""sv, details::GetWindowTextString(input));
+				format_to(ctx.out(), " \"{}\""sv, taz::details::GetWindowTextString(input));
 			}
 
 			if (m_showWindowClass)
 			{
-				format_to(ctx.out(), " \"{}\""sv, details::GetWindowClassNameString(input));
+				format_to(ctx.out(), " \"{}\""sv, taz::details::GetWindowClassNameString(input));
 			}
 
 			return ctx.out();

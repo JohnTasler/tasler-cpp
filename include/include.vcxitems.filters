@@ -19,6 +19,8 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)taz\window_enumeration.h">
       <Filter>taz</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)taz\logger.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)taz\console.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="taz">
