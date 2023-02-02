@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)debug.h">
+      <Filter>taz</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)environment_utility.h">
+      <Filter>taz</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)formatters.h">
+      <Filter>taz</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)resource_loader.h">
+      <Filter>taz</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)string_utility.h">
+      <Filter>taz</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)window_enumeration.h">
+      <Filter>taz</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="taz">
+      <UniqueIdentifier>{959b652c-e0a1-4e0c-9a7a-b16240094dd1}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
