@@ -1,16 +1,22 @@
 #pragma once
 
+// Windows headers
 #include <winbase.h>
 #include <stringapiset.h>
 
+// Standard C++ headers
 #include <map>
 #include <string>
 #include <string_view>
+
+// WIL headers
+#include <wil/result.h>
 #include <wil/resource.h>
 
+// Local headers
 #include "string_utility.h"
 
-namespace jtasler::environment_utility
+namespace taz::environment_utility
 {
     [[nodiscard]]
     inline std::wstring get_variable(PCWSTR variableName)

@@ -1,6 +1,8 @@
 #pragma once
 
-#include "stdafx.h"
+#include <format>
+#include <string>
+#include <wtypes.h>
 
 namespace details
 {

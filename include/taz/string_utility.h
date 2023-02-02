@@ -2,8 +2,9 @@
 
 #include <string>
 #include <string_view>
+#include <vector>
 
-namespace jtasler::string_utility
+namespace taz::string_utility
 {
     inline std::string narrow(std::wstring_view wideText)
     {
