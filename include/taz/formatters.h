@@ -8,6 +8,9 @@
 #include <format>
 #include <string>
 
+// Tasler C++ headers
+#include "string_utility.h"
+
 namespace taz::details
 {
 	inline std::string GetWindowTextString(HWND hwnd)
@@ -26,44 +29,62 @@ namespace taz::details
 		className.resize(classNameLength);
 		return className;
 	}
-}
 
-namespace std
-{
-	template<>
-	struct formatter<const wchar_t*, char> : _Formatter_base<const wchar_t*, char, _Basic_format_arg_type::_Custom_type>
+	template <std::convertible_to<const wchar_t*> _Ty>
+	struct wide_to_narrow_formatter : std::_Formatter_base<_Ty, char, std::_Basic_format_arg_type::_Custom_type>
 	{
-		auto format(const wchar_t* input, std::format_context& ctx)
+		constexpr auto parse(std::format_parse_context& ctx)
 		{
-			// Measure for the conversion to UTF-8
-			std::wstring_view inputString{ input };
-			auto bytesNeeded = WideCharToMultiByte(CP_UTF8, 0, inputString.data(), static_cast<int>(inputString.size()), nullptr, 0, nullptr, nullptr);
+			return ctx.begin();
+		}
 
-			// Convert to UTF-8
-			std::vector<char> output(bytesNeeded);
-			WideCharToMultiByte(CP_UTF8, 0, inputString.data(), static_cast<int>(inputString.size()), output.data(), bytesNeeded, nullptr, nullptr);
+		auto format(_Ty input, std::format_context& ctx)
+		{
+			auto output = taz::string_utility::narrow(input);
 
 			// Write it out
 			return std::copy(begin(output), end(output), ctx.out());
 		}
 	};
 
-	template<>
-	struct formatter<const char*, wchar_t> : _Formatter_base<const char*, wchar_t, _Basic_format_arg_type::_Custom_type>
+	template <std::convertible_to<const char*> _Ty>
+	struct narrow_to_wide_formatter : std::_Formatter_base<_Ty, wchar_t, std::_Basic_format_arg_type::_Custom_type>
 	{
-		auto format(const char* input, std::wformat_context& ctx)
+		constexpr auto parse(std::wformat_parse_context& ctx)
 		{
-			// Measure for the conversion to UTF-8
-			std::string_view inputString{ input };
-			auto bytesNeeded = MultiByteToWideChar(CP_UTF8, 0, inputString.data(), static_cast<int>(inputString.size()), nullptr, 0);
+			return ctx.begin();
+		}
 
-			// Convert to UTF-8
-			std::vector<wchar_t> output(bytesNeeded);
-			MultiByteToWideChar(CP_UTF8, 0, inputString.data(), static_cast<int>(inputString.size()), output.data(), bytesNeeded);
+		auto format(_Ty input, std::wformat_context& ctx)
+		{
+			auto output = taz::string_utility::widen(input);
 
 			// Write it out
 			return std::copy(begin(output), end(output), ctx.out());
 		}
+	};
+}
+
+namespace std
+{
+	template <>
+	struct formatter<const wchar_t*, char> : taz::details::wide_to_narrow_formatter<const wchar_t*>
+	{
+	};
+
+	template <>
+	struct formatter<wchar_t*, char> : taz::details::wide_to_narrow_formatter<wchar_t*>
+	{
+	};
+
+	template<>
+	struct formatter<const char*, wchar_t> : taz::details::narrow_to_wide_formatter<const char*>
+	{
+	};
+
+	template<>
+	struct formatter<char*, wchar_t> : taz::details::narrow_to_wide_formatter<char*>
+	{
 	};
 
 	template <>
