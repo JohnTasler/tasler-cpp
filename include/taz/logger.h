@@ -15,7 +15,7 @@ using namespace std::literals;
 namespace taz
 {
 	template <typename Writer>
-	concept log_writer = std::copy_constructible<Writer> && requires(Writer w)
+	concept log_writer = (std::copy_constructible<Writer> || std::move_constructible<Writer>) && requires(Writer w)
 	{
 		w.write_out(""s);
 		w.write_out(L""s);
@@ -56,8 +56,8 @@ namespace taz
 			m_writer.write_out(message);
 		}
 
-		logger(Writer const& writer)
-			: m_writer(writer)
+		logger(Writer&& writer)
+			: m_writer(std::move(writer))
 		{
 		}
 		~logger() = default;

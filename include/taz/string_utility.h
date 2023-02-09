@@ -8,13 +8,12 @@ namespace taz::string_utility
 {
     inline std::string narrow(std::wstring_view wideText)
     {
-        std::string multibyteText;
         int32_t byteCount = ::WideCharToMultiByte(CP_UTF8, 0,
             wideText.data(), static_cast<int32_t>(wideText.length()),
             nullptr, 0,
             nullptr, nullptr);
 
-        multibyteText.resize(byteCount);
+        std::string multibyteText(byteCount, '\0');
         ::WideCharToMultiByte(CP_UTF8, 0,
             wideText.data(), static_cast<int32_t>(wideText.length()),
             multibyteText.data(), static_cast<int32_t>(multibyteText.length()),
@@ -25,12 +24,11 @@ namespace taz::string_utility
 
     inline std::wstring widen(std::string_view multibylteText)
     {
-        std::wstring wideText;
         int32_t byteCount = ::MultiByteToWideChar(CP_UTF8, 0,
             multibylteText.data(), static_cast<int32_t>(multibylteText.length()),
             nullptr, 0);
 
-        wideText.resize(byteCount);
+        std::wstring wideText(byteCount, L'\0');
         ::MultiByteToWideChar(CP_UTF8, 0,
             multibylteText.data(), static_cast<int32_t>(multibylteText.length()),
             wideText.data(), static_cast<int32_t>(wideText.length()));

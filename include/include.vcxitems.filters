@@ -21,6 +21,7 @@
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)taz\logger.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)taz\console.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)taz\thread_queue.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="taz">
