@@ -40,7 +40,7 @@ namespace taz::details
 
 		auto format(_Ty input, std::format_context& ctx)
 		{
-			auto output = taz::string_utility::narrow(input);
+			auto output = input ? taz::string_utility::narrow(input) : std::string{};
 
 			// Write it out
 			return std::copy(begin(output), end(output), ctx.out());
@@ -57,7 +57,7 @@ namespace taz::details
 
 		auto format(_Ty input, std::wformat_context& ctx)
 		{
-			auto output = taz::string_utility::widen(input);
+			auto output = input ? taz::string_utility::widen(input) : std::wstring{};
 
 			// Write it out
 			return std::copy(begin(output), end(output), ctx.out());

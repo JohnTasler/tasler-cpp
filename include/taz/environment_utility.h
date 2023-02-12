@@ -2,6 +2,7 @@
 
 // Windows headers
 #include <winbase.h>
+#include <processenv.h>
 #include <stringapiset.h>
 
 // Standard C++ headers
@@ -63,5 +64,4 @@ namespace taz::environment_utility
 
         return result;
     }
-
 }
