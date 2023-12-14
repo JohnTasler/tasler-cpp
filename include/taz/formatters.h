@@ -11,6 +11,8 @@
 // Tasler C++ headers
 #include "string_utility.h"
 
+#include <chrono>
+
 namespace taz::details
 {
 	inline std::string GetWindowTextString(HWND hwnd)
@@ -31,14 +33,14 @@ namespace taz::details
 	}
 
 	template <std::convertible_to<const wchar_t*> _Ty>
-	struct wide_to_narrow_formatter : std::_Formatter_base<_Ty, char, std::_Basic_format_arg_type::_Custom_type>
+	struct wide_to_narrow_formatter
 	{
 		constexpr auto parse(std::format_parse_context& ctx)
 		{
 			return ctx.begin();
 		}
 
-		auto format(_Ty input, std::format_context& ctx)
+		auto format(const _Ty input, auto& ctx) const
 		{
 			auto output = input ? taz::string_utility::narrow(input) : std::string{};
 
@@ -48,14 +50,14 @@ namespace taz::details
 	};
 
 	template <std::convertible_to<const char*> _Ty>
-	struct narrow_to_wide_formatter : std::_Formatter_base<_Ty, wchar_t, std::_Basic_format_arg_type::_Custom_type>
+	struct narrow_to_wide_formatter
 	{
 		constexpr auto parse(std::wformat_parse_context& ctx)
 		{
 			return ctx.begin();
 		}
 
-		auto format(_Ty input, std::wformat_context& ctx)
+		auto format(const _Ty input, auto& ctx) const
 		{
 			auto output = input ? taz::string_utility::widen(input) : std::wstring{};
 
@@ -88,7 +90,7 @@ namespace std
 	};
 
 	template <>
-	struct formatter<HWND, char> : formatter<uint32_t, char>
+	struct formatter<HWND>
 	{
 		constexpr auto parse(std::format_parse_context& ctx)
 		{
@@ -100,11 +102,11 @@ namespace std
 				}
 			}
 
-			auto resultIterator = formatter<uint32_t, char>::parse(ctx);
+			auto resultIterator = m_innerFormatter.parse(ctx);
 			return resultIterator;
 		}
 
-		auto format(HWND input, std::format_context& ctx)
+		auto format(const HWND input, auto& ctx) const
 		{
 			auto value = static_cast<uint32_t>(reinterpret_cast<uint64_t>(input));
 			if (m_useDefaultFormatting)
@@ -139,6 +141,7 @@ namespace std
 		bool m_showHexPrefix : 1 {};
 		bool m_showWindowText : 1 {};
 		bool m_showWindowClass : 1 {};
+		formatter<uint32_t, char> m_innerFormatter{};
 	};
 }
 

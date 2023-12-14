@@ -25,6 +25,10 @@ namespace taz
 			#endif
 		}
 
+		void exit()
+		{
+		}
+
 		debug_output() = default;
 		~debug_output() = default;
 		debug_output(debug_output const&) = default;

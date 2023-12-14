@@ -8,6 +8,7 @@
 #include <utility>
 
 // Local headers
+#include "formatters.h"
 #include "logger.h"
 #include "string_utility.h"
 #include "thread_queue.h"
@@ -36,6 +37,11 @@ namespace taz
 		console_output(console_output&&) = default;
 		console_output& operator=(console_output const&) = default;
 		console_output& operator=(console_output&&) = default;
+
+		void exit()
+		{
+			s_queue.exit();
+		}
 
 	public:
 		struct StringWorkItem final

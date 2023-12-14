@@ -19,6 +19,7 @@ namespace taz
 	{
 		w.write_out(""s);
 		w.write_out(L""s);
+		w.exit();
 	};
 
 
@@ -67,6 +68,11 @@ namespace taz
 		logger(logger&&) = default;
 		logger& operator=(logger const&) = default;
 		logger& operator=(logger&&) = default;
+
+		void exit()
+		{
+			m_writer.exit();
+		}
 
 	private:
 		Writer m_writer{};

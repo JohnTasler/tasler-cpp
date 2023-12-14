@@ -49,7 +49,7 @@ namespace taz
 		{
 			std::array<HANDLE, 2> events = { m_exitEvent.get(), m_readyEvent.get() };
 			DWORD result{};
-			while ((result = WaitForMultipleObjects(events.size(), events.data(), false, INFINITE)) == (WAIT_OBJECT_0 + 1))
+			while ((result = WaitForMultipleObjects((DWORD)events.size(), events.data(), false, INFINITE)) == (WAIT_OBJECT_0 + 1))
 			{
 				auto lock = m_lock.lock_exclusive();
 				while (!m_queue.empty())
