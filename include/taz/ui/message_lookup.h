@@ -295,19 +295,19 @@ namespace taz::ui::message_lookup
 			return lower_bound->second;
 
 		if (message >= WM_USER && message <= WM_APP)
-			return messageString = std::format(L"WM_USER + {} (0x{:4X})"sv, message - WM_USER, message);
+			return messageString = std::format(L"WM_USER + {} (0x{:04X})"sv, message - WM_USER, message);
 
 		if (message >= WM_HANDHELDFIRST && message <= WM_HANDHELDLAST)
-			return messageString = std::format(L"WM_HANDHELDFIRST + {} (0x{:4X})"sv, message - WM_HANDHELDFIRST, message);
+			return messageString = std::format(L"WM_HANDHELDFIRST + {} (0x{:04X})"sv, message - WM_HANDHELDFIRST, message);
 
 		if (message >= WM_AFXFIRST && message <= WM_AFXLAST)
-			return messageString = std::format(L"WM_AFXFIRST + {} (0x{:4X})"sv, message - WM_AFXFIRST, message);
+			return messageString = std::format(L"WM_AFXFIRST + {} (0x{:04X})"sv, message - WM_AFXFIRST, message);
 
 		if (message >= WM_PENWINFIRST && message <= WM_PENWINLAST)
-			return messageString = std::format(L"WM_PENWINFIRST + {} (0x{:4X})"sv, message - WM_PENWINFIRST, message);
+			return messageString = std::format(L"WM_PENWINFIRST + {} (0x{:04X})"sv, message - WM_PENWINFIRST, message);
 
 		if (message >= WM_TABLET_FIRST && message <= WM_TABLET_LAST)
-			return messageString = std::format(L"WM_TABLET_FIRST + {} (0x{:4X})"sv, message - WM_TABLET_FIRST, message);
+			return messageString = std::format(L"WM_TABLET_FIRST + {} (0x{:04X})"sv, message - WM_TABLET_FIRST, message);
 
 		if (message >= WM_APP)
 			return messageString = std::format(L"WM_APP + {} (0x{:04X})"sv, message - WM_APP, message);

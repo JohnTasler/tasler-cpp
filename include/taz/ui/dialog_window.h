@@ -114,7 +114,7 @@ namespace taz::ui
 		this->derived().m_hwnd = CreateDialogParamW(taz::ui::application_base::current().instance_handle(), templateName, nullptr, dialog_proc_thunk, parameter);
 		if (!this->derived().m_hwnd)
 		{
-			taz::debug.write_line("dialog_window<TDerived>::create_from_template: CreateDialogParamW failed with LastError={:08X}", GetLastError());
+			taz::debug.write_line("dialog_window::create_from_template: CreateDialogParamW failed with LastError={:08X}", GetLastError());
 			return nullptr;
 		}
 
@@ -131,7 +131,7 @@ namespace taz::ui
 	inline void dialog_window<TDerived>::initialize_and_show(HWND hwnd, bool isDialog)
 	{
 		if (this->derived().m_hwnd)
-			throw std::logic_error("dialog_window<TDerived>::initialize_and_show: The dialog window is already initialized.");
+			throw std::logic_error("dialog_window::initialize_and_show: The dialog window is already initialized.");
 
 		if (hwnd)
 		{
@@ -245,8 +245,8 @@ namespace taz::ui
 			m_inFormatting = true;
 			auto formattingScope = wil::scope_exit([this]() { m_inFormatting = false; });
 			auto messageName = message_lookup::get_name(message).data();
-			taz::debug.write_line("dialog_window::dialog_proc: message={} wParam={:016X} lParam={:016X} hwnd={}", messageName, wParam, lParam, hwnd);
-			taz::console_out.write_line("dialog_window::dialog_proc: message={} wParam={:016X} lParam={:016X} hwnd={}", messageName, wParam, lParam, hwnd);
+			taz::debug.write_line("dialog_window::dialog_proc: wParam={:016X} lParam={:016X} hwnd={} {}", wParam, lParam, hwnd, messageName);
+			taz::console_out.write_line("dialog_window::dialog_proc: wParam={:016X} lParam={:016X} hwnd={} {}", wParam, lParam, hwnd, messageName);
 		}
 
 		std::optional<LRESULT> result;
@@ -284,7 +284,7 @@ namespace taz::ui
 
 		// Turn the console window into a child in our client area
 		attach_to_console();
-		taz::console_out.write_line("dialog_window<TDerived>::on_wm_init_dialog: Hello, world\n");
+		taz::console_out.write_line("dialog_window::on_wm_init_dialog: Hello, world\n");
 
 		return result;
 	}
