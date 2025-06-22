@@ -36,8 +36,8 @@ namespace taz::ui
 		bool on_destroy();
 
 	protected:
-		HWND create_from_template(uint16_t templateID, LPARAM parameter = nullptr);
-		HWND create_from_template(PCWSTR templateName, LPARAM parameter = nullptr);
+		HWND create_from_template(uint16_t templateID, LPARAM parameter = NULL);
+		HWND create_from_template(PCWSTR templateName, LPARAM parameter = NULL);
 		void initialize_and_show(HWND hwnd, bool isDialog);
 		void attach_to_console();
 		void detach_from_console();
