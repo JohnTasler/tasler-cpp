@@ -144,9 +144,6 @@ namespace taz::ui
 				SendMessageW(hwnd, WM_INITDIALOG, reinterpret_cast<WPARAM>(hwndTab), {});
 			}
 
-			this->derived().load_big_icon();
-			this->derived().load_small_icon();
-
 			ShowWindow(hwnd, SW_SHOW);
 		}
 	}
