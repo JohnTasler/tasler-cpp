@@ -109,26 +109,20 @@ namespace std
 		auto format(const HWND input, auto& ctx) const
 		{
 			auto value = static_cast<uint32_t>(reinterpret_cast<uint64_t>(input));
-			if (m_useDefaultFormatting)
-			{
-				m_showHexPrefix = true;
-				m_showWindowClass = true;
-				m_showWindowText = true;
-			}
 
-			if (m_showHexPrefix)
+			if (m_showHexPrefix || m_useDefaultFormatting)
 			{
 				format_to(ctx.out(), "0x"sv);
 			}
 
 			format_to(ctx.out(), "{:08X}"sv, value);
 
-			if (m_showWindowText)
+			if (m_showWindowText || m_useDefaultFormatting)
 			{
 				format_to(ctx.out(), " \"{}\""sv, taz::details::GetWindowTextString(input));
 			}
 
-			if (m_showWindowClass)
+			if (m_showWindowClass || m_useDefaultFormatting)
 			{
 				format_to(ctx.out(), " \"{}\""sv, taz::details::GetWindowClassNameString(input));
 			}

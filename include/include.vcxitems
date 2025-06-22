@@ -24,6 +24,13 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)taz\resource_loader.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)taz\string_utility.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)taz\thread_queue.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)taz\ui\application.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)taz\ui\application_base.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)taz\ui\dialog_window.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)taz\ui\message_lookup.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)taz\ui\resize_type.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)taz\ui\top_level_window.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)taz\ui\window_base.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)taz\window_enumeration.h" />
   </ItemGroup>
 </Project>

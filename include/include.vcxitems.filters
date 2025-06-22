@@ -19,14 +19,48 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)taz\window_enumeration.h">
       <Filter>taz</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)taz\logger.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)taz\console.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)taz\thread_queue.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)taz\error_utility.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)taz\ui\application.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)taz\ui\application.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)taz\ui\application_base.h">
+      <Filter>taz\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)taz\ui\dialog_window.h">
+      <Filter>taz\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)taz\console.h">
+      <Filter>taz</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)taz\error_utility.h">
+      <Filter>taz</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)taz\logger.h">
+      <Filter>taz</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)taz\thread_queue.h">
+      <Filter>taz</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)taz\ui\application.h">
+      <Filter>taz\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)taz\ui\window_base.h">
+      <Filter>taz\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)taz\ui\top_level_window.h">
+      <Filter>taz\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)taz\ui\resize_type.h">
+      <Filter>taz\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)taz\ui\message_lookup.h">
+      <Filter>taz\ui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="taz">
       <UniqueIdentifier>{959b652c-e0a1-4e0c-9a7a-b16240094dd1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="taz\ui">
+      <UniqueIdentifier>{73fe03e3-4d0b-498e-9a8f-92c8853d77e6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

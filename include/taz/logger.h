@@ -61,7 +61,10 @@ namespace taz
 			: m_writer(std::move(writer))
 		{
 		}
-		~logger() = default;
+		~logger()
+		{
+			exit();
+		}
 
 		logger() = delete;
 		logger(logger const&) = default;
