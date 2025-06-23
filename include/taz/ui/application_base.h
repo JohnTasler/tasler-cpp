@@ -123,7 +123,7 @@ namespace taz::ui
 		m_hwndConsole = GetConsoleWindow();
 //		ShowWindow(m_hwndConsole, SW_HIDE);
 
-		std::println(stdout, "wWinMain: Allocated console with handle {0:016X}", m_hwndConsole);
+		std::println(stdout, "application_base::allocate_console: Allocated console with handle {0:016X}", m_hwndConsole);
 
 		// Set the console window's title
 		SetConsoleTitle(consoleTitle);

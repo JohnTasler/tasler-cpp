@@ -45,9 +45,9 @@ namespace taz::ui
 			return -1; // Exit on error
 		}
 
-		allocate_console(L"Application Console");
+		// allocate_console(L"Application Console");
 		auto result = derived().run_message_loop(hwnd);
-		free_console();
+		// free_console();
 
 		return result;
 	}

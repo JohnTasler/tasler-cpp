@@ -6,7 +6,7 @@
 // Local headers
 #include "logger.h"
 
-#define ALWAYS_OUTPUT_LOGGER_STRING true
+#define ALWAYS_OUTPUT_LOGGER_STRING false
 
 namespace taz
 {

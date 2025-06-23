@@ -13,16 +13,21 @@ namespace taz::ui
 	template<typename TDerived>
 	struct window_base
 	{
+		~window_base()
+		{
+
+		}
 		friend typename TDerived;
 
 		// Overridable methods
+		void on_subclassed(HWND hwnd) {}
 		std::optional<LRESULT> on_message(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) { return std::nullopt; }
 		void on_resized(ResizeType resizeType, uint16_t cx, uint16_t cy) {}
 		void on_locale_policy_setting_changed() {}
 		void on_user_policy_setting_changed() {}
 		void on_machine_policy_setting_changed() {}
 		void on_system_parameter_setting_changed(uint32_t uiAction, std::wstring_view pszSection) {}
-		HBRUSH get_background_brush() const { return reinterpret_cast<HBRUSH>(GetStockObject(DKGRAY_BRUSH)); }
+		HBRUSH get_background_brush() const { return reinterpret_cast<HBRUSH>(GetStockObject(GRAY_BRUSH)); }
 		uint16_t on_non_client_hit_test(int defaultCode, uint16_t cxScreen, uint16_t cyScreen);
 		bool on_erase_background(HDC hdc) { return false; };
 		bool on_closed() { return true; };
@@ -31,12 +36,12 @@ namespace taz::ui
 		void on_accelerator_command(uint16_t commandID) {}
 		void on_control_command(uint16_t notificationCode, uint16_t controlID) {}
 		void on_notify(NMHDR header, uint16_t controlID) {}
+		void initialize_and_show(HWND hwnd, bool isDialog);
 		HWND hwnd() const { return this->const_derived().m_hwnd; }
 
 	protected:
 		void subclass_window(HWND hwnd);
 		void unsubclass_window(HWND hwnd);
-		void initialize_and_show(HWND hwnd);
 		static TDerived* from_hwnd(HWND hwnd)
 		{
 			auto ptr = reinterpret_cast<TDerived*>(GetWindowLongPtrW(hwnd, GWLP_USERDATA));
@@ -44,7 +49,6 @@ namespace taz::ui
 				throw std::logic_error("The window is not subclassed or the user data is not set.");
 			return ptr;
 		}
-
 		window_base()
 		{
 			static_assert(std::is_base_of_v<window_base, TDerived>, "TDerived must inherit from window_base");
@@ -55,7 +59,7 @@ namespace taz::ui
 		TDerived const& const_derived() const { return *static_cast<TDerived const*>(this); }
 
 	private:
-		static window_base* window_base_from_hwnd(HWND hwnd);
+		static window_base* window_base_from_hwnd(HWND hwnd, bool noThrow = false);
 		static LRESULT STDAPICALLTYPE window_proc_thunk(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 		LRESULT window_proc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 		void on_wm_setting_change(uint32_t parameterType, std::wstring_view sectionName);
@@ -69,10 +73,10 @@ namespace taz::ui
 	};
 
 	template<typename TDerived>
-	inline window_base<TDerived>* window_base<TDerived>::window_base_from_hwnd(HWND hwnd)
+	inline window_base<TDerived>* window_base<TDerived>::window_base_from_hwnd(HWND hwnd, bool noThrow)
 	{
 		auto ptr = reinterpret_cast<window_base*>(GetWindowLongPtrW(hwnd, GWLP_USERDATA));
-		if (!ptr)
+		if (!ptr && !noThrow)
 			throw std::logic_error("The window is not subclassed or the user data is not set.");
 		return ptr;
 	}
@@ -106,6 +110,18 @@ namespace taz::ui
 		else
 		{
 			throw std::logic_error("The window is not subclassed.");
+		}
+	}
+
+	template<typename TDerived>
+	inline void window_base<TDerived>::initialize_and_show(HWND hwnd, bool isDialogAsWindow)
+	{
+		if (hwnd)
+		{
+			this->derived().m_hwnd = hwnd;
+			this->subclass_window(hwnd);
+			this->derived().on_subclassed(hwnd, isDialogAsWindow);
+			ShowWindow(hwnd, SW_SHOW);
 		}
 	}
 

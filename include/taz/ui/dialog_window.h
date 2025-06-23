@@ -22,7 +22,10 @@ namespace taz::ui
 			static_assert(std::is_base_of_v<dialog_window, TDerived>, "TDerived must inherit from dialog_window");
 		}
 
-		~dialog_window() = default;
+		~dialog_window()
+		{
+			OutputDebugStringW(L"~dialog_window: dtor\r\n");
+		}
 
 		// Statically overridable methods
 		HWND create();
@@ -30,15 +33,15 @@ namespace taz::ui
 		bool make_console_child_of_main() const { return false; }
 		HICON load_big_icon() { return nullptr; }
 		HICON load_small_icon() { return nullptr; }
+		void on_subclassed(HWND hwnd, bool isDialogAsWindow);
 		bool on_init_dialog(HWND hwndFocusControl, LPARAM parameter) { return true; }
 		void on_resized(ResizeType resizeType, uint16_t cx, uint16_t cy);
 		bool on_close();
 		bool on_destroy();
 
 	protected:
-		HWND create_from_template(uint16_t templateID, LPARAM parameter = NULL);
-		HWND create_from_template(PCWSTR templateName, LPARAM parameter = NULL);
-		void initialize_and_show(HWND hwnd, bool isDialog);
+		HWND create_from_template(uint16_t templateID);
+		HWND create_from_template(PCWSTR templateName);
 		void attach_to_console();
 		void detach_from_console();
 
@@ -48,13 +51,7 @@ namespace taz::ui
 		dialog_window& operator=(const dialog_window&) = delete;
 		dialog_window& operator=(dialog_window&&) = delete;
 
-		static dialog_window* dialog_window_from_hwnd(HWND hwnd)
-		{
-			auto ptr = reinterpret_cast<dialog_window*>(GetWindowLongPtrW(hwnd, GWLP_USERDATA));
-			if (!ptr)
-				throw std::logic_error("The dialog window is not subclassed or the user data is not set.");
-			return ptr;
-		}
+		static dialog_window* dialog_window_from_hwnd(HWND hwnd, bool noThrow = false);
 		static INT_PTR CALLBACK dialog_proc_thunk(HWND, UINT, WPARAM, LPARAM);
 		INT_PTR dialog_proc(HWND, UINT, WPARAM, LPARAM);
 		bool on_wm_init_dialog(HWND hwndFocusControl, LPARAM parameter);
@@ -102,50 +99,24 @@ namespace taz::ui
 	}
 
 	template<typename TDerived>
-	inline HWND dialog_window<TDerived>::create_from_template(uint16_t templateID, LPARAM parameter)
+	inline HWND dialog_window<TDerived>::create_from_template(uint16_t templateID)
 	{
-		return create_from_template(MAKEINTRESOURCEW(templateID), parameter);
+		return create_from_template(MAKEINTRESOURCEW(templateID));
 	}
 
 	template<typename TDerived>
-	inline HWND dialog_window<TDerived>::create_from_template(PCWSTR templateName, LPARAM parameter)
+	inline HWND dialog_window<TDerived>::create_from_template(PCWSTR templateName)
 	{
 		// Create a dialog box with the specified template name and parameter
-		this->derived().m_hwnd = CreateDialogParamW(taz::ui::application_base::current().instance_handle(), templateName, nullptr, dialog_proc_thunk, parameter);
+		auto parameter = reinterpret_cast<LPARAM>(&this->derived());
+		this->derived().m_hwnd = CreateDialogParamW(application_base::current().instance_handle(), templateName, nullptr, dialog_proc_thunk, parameter);
 		if (!this->derived().m_hwnd)
 		{
 			taz::debug.write_line("dialog_window::create_from_template: CreateDialogParamW failed with LastError={:08X}", GetLastError());
 			return nullptr;
 		}
 
-		this->subclass_window(this->derived().m_hwnd);
-
-		// Set focus to the first enabled tabstop control
-		SetFocus(GetNextDlgTabItem(this->derived().m_hwnd, nullptr, false));
-
-		ShowWindow(this->derived().m_hwnd, SW_SHOW);
 		return this->derived().m_hwnd;
-	}
-
-	template<typename TDerived>
-	inline void dialog_window<TDerived>::initialize_and_show(HWND hwnd, bool isDialog)
-	{
-		if (this->derived().m_hwnd)
-			throw std::logic_error("dialog_window::initialize_and_show: The dialog window is already initialized.");
-
-		if (hwnd)
-		{
-			this->derived().m_hwnd = hwnd;
-			this->subclass_window(hwnd);
-			if (isDialog)
-			{
-				SetWindowLongPtrW(hwnd, DWLP_DLGPROC, reinterpret_cast<LONG_PTR>(dialog_proc_thunk));
-				HWND hwndTab = GetNextDlgTabItem(this->derived().m_hwnd, nullptr, false);
-				SendMessageW(hwnd, WM_INITDIALOG, reinterpret_cast<WPARAM>(hwndTab), {});
-			}
-
-			ShowWindow(hwnd, SW_SHOW);
-		}
 	}
 
 	template<typename TDerived>
@@ -228,26 +199,44 @@ namespace taz::ui
 		}
 	}
 
+	template<typename TDerived>
+	inline dialog_window<TDerived>* dialog_window<TDerived>::dialog_window_from_hwnd(HWND hwnd, bool noThrow)
+	{
+		auto ptr = reinterpret_cast<dialog_window*>(GetWindowLongPtrW(hwnd, GWLP_USERDATA));
+		if (!ptr && !noThrow)
+			throw std::logic_error("The dialog window is not subclassed or the user data is not set.");
+		return ptr;
+	}
+
 	// Dialog procedure for main window dialog box
 	template<typename TDerived>
 	inline INT_PTR CALLBACK dialog_window<TDerived>::dialog_proc_thunk(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
-		if (auto& that = *(dialog_window_from_hwnd(hwnd)); &that)
+		// If this is the initialization message, we need to set the user data
+		if (message == WM_INITDIALOG && lParam)
+		{
+			SetWindowLongPtrW(hwnd, GWLP_USERDATA, lParam);
+		}
+
+		if (auto& that = *(dialog_window_from_hwnd(hwnd, true)); &that)
+		{
+			that.m_hwnd = hwnd;
 			that.dialog_proc(hwnd, message, wParam, lParam);
+		}
 		return 0;
 	}
 
 	template<typename TDerived>
 	inline INT_PTR dialog_window<TDerived>::dialog_proc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
-		if (!m_inFormatting)
-		{
-			m_inFormatting = true;
-			auto formattingScope = wil::scope_exit([this]() { m_inFormatting = false; });
-			auto messageName = message_lookup::get_name(message).data();
-			taz::debug.write_line("dialog_window::dialog_proc: wParam={:016X} lParam={:016X} hwnd={} {}", wParam, lParam, hwnd, messageName);
-			taz::console_out.write_line("dialog_window::dialog_proc: wParam={:016X} lParam={:016X} hwnd={} {}", wParam, lParam, hwnd, messageName);
-		}
+		//if (!m_inFormatting)
+		//{
+		//	m_inFormatting = true;
+		//	auto formattingScope = wil::scope_exit([this]() { m_inFormatting = false; });
+		//	auto messageName = message_lookup::get_name(message).data();
+		//	taz::debug.write_line("dialog_window::dialog_proc: wParam={:016X} lParam={:016X} hwnd={} {}", wParam, lParam, hwnd, messageName);
+		//	taz::console_out.write_line("dialog_window::dialog_proc: wParam={:016X} lParam={:016X} hwnd={} {}", wParam, lParam, hwnd, messageName);
+		//}
 
 		std::optional<LRESULT> result;
 
@@ -264,6 +253,17 @@ namespace taz::ui
 	}
 
 	template<typename TDerived>
+	inline void dialog_window<TDerived>::on_subclassed(HWND hwnd, bool isDialogAsWindow)
+	{
+		SetWindowLongPtrW(hwnd, DWLP_DLGPROC, reinterpret_cast<LONG_PTR>(dialog_proc_thunk));
+		if (isDialogAsWindow)
+		{
+			HWND hwndTab = GetNextDlgTabItem(this->derived().m_hwnd, nullptr, false);
+			SendMessageW(hwnd, WM_INITDIALOG, reinterpret_cast<WPARAM>(hwndTab), {});
+		}
+	}
+
+	template<typename TDerived>
 	inline bool dialog_window<TDerived>::on_wm_init_dialog(HWND hwndFocusControl, LPARAM parameter)
 	{
 		// Center the dialog if specified
@@ -271,13 +271,10 @@ namespace taz::ui
 		if (style & DS_CENTER)
 			this->center_on_desktop();
 
-		// Set the background color
-		SetClassLongPtrW(this->hwnd(), GCLP_HBRBACKGROUND, reinterpret_cast<LONG_PTR>(this->derived().get_background_brush()));
-
 		// Set the large and small icons
-		SendMessage(this->hwnd(), WM_SETICON, ICON_BIG, reinterpret_cast<LPARAM>(this->derived().load_big_icon()));
-		SendMessage(this->hwnd(), WM_SETICON, ICON_SMALL, reinterpret_cast<LPARAM>(this->derived().load_small_icon()));
 		SendMessage(this->hwnd(), WM_SETICON, ICON_SMALL2, reinterpret_cast<LPARAM>(this->derived().load_small_icon()));
+		SendMessage(this->hwnd(), WM_SETICON, ICON_SMALL, reinterpret_cast<LPARAM>(this->derived().load_small_icon()));
+		SendMessage(this->hwnd(), WM_SETICON, ICON_BIG, reinterpret_cast<LPARAM>(this->derived().load_big_icon()));
 
 		// Allow the derived class to handle initialization
 		bool result = this->derived().on_init_dialog(hwndFocusControl, parameter);
