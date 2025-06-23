@@ -16,17 +16,6 @@ namespace taz::ui
 	{
 		friend TDerived;
 
-		dialog_window()
-		{
-			this->derived().m_hwnd = this->derived().create();
-			static_assert(std::is_base_of_v<dialog_window, TDerived>, "TDerived must inherit from dialog_window");
-		}
-
-		~dialog_window()
-		{
-			OutputDebugStringW(L"~dialog_window: dtor\r\n");
-		}
-
 		// Statically overridable methods
 		HWND create();
 		bool is_main_application_window() { return false; }
@@ -46,6 +35,10 @@ namespace taz::ui
 		void detach_from_console();
 
 	private:
+		dialog_window()
+		{
+			static_assert(std::is_base_of_v<dialog_window, TDerived>, "TDerived must inherit from dialog_window");
+		}
 		dialog_window(const dialog_window&) = delete;
 		dialog_window(dialog_window&&) = delete;
 		dialog_window& operator=(const dialog_window&) = delete;
@@ -218,7 +211,7 @@ namespace taz::ui
 			SetWindowLongPtrW(hwnd, GWLP_USERDATA, lParam);
 		}
 
-		if (auto& that = *(dialog_window_from_hwnd(hwnd, true)); &that)
+		if (auto& that = *dialog_window<TDerived>::from_hwnd(hwnd, false); &that)
 		{
 			that.m_hwnd = hwnd;
 			that.dialog_proc(hwnd, message, wParam, lParam);
@@ -241,7 +234,7 @@ namespace taz::ui
 		std::optional<LRESULT> result;
 
 		if (message == WM_INITDIALOG)
-			return this->on_wm_init_dialog(reinterpret_cast<HWND>(wParam), lParam);
+			return this->derived().on_wm_init_dialog(reinterpret_cast<HWND>(wParam), lParam);
 
 		if (message == WM_COMMAND)
 			result = true;
@@ -255,7 +248,7 @@ namespace taz::ui
 	template<typename TDerived>
 	inline void dialog_window<TDerived>::on_subclassed(HWND hwnd, bool isDialogAsWindow)
 	{
-		SetWindowLongPtrW(hwnd, DWLP_DLGPROC, reinterpret_cast<LONG_PTR>(dialog_proc_thunk));
+		SetWindowLongPtrW(hwnd, DWLP_DLGPROC, reinterpret_cast<LONG_PTR>(this->derived().dialog_proc_thunk));
 		if (isDialogAsWindow)
 		{
 			HWND hwndTab = GetNextDlgTabItem(this->derived().m_hwnd, nullptr, false);
@@ -272,9 +265,9 @@ namespace taz::ui
 			this->center_on_desktop();
 
 		// Set the large and small icons
-		SendMessage(this->hwnd(), WM_SETICON, ICON_SMALL2, reinterpret_cast<LPARAM>(this->derived().load_small_icon()));
-		SendMessage(this->hwnd(), WM_SETICON, ICON_SMALL, reinterpret_cast<LPARAM>(this->derived().load_small_icon()));
-		SendMessage(this->hwnd(), WM_SETICON, ICON_BIG, reinterpret_cast<LPARAM>(this->derived().load_big_icon()));
+		SendMessage(this->derived().hwnd(), WM_SETICON, ICON_SMALL2, reinterpret_cast<LPARAM>(this->derived().load_small_icon()));
+		SendMessage(this->derived().hwnd(), WM_SETICON, ICON_SMALL, reinterpret_cast<LPARAM>(this->derived().load_small_icon()));
+		SendMessage(this->derived().hwnd(), WM_SETICON, ICON_BIG, reinterpret_cast<LPARAM>(this->derived().load_big_icon()));
 
 		// Allow the derived class to handle initialization
 		bool result = this->derived().on_init_dialog(hwndFocusControl, parameter);
@@ -286,4 +279,3 @@ namespace taz::ui
 		return result;
 	}
 }
-

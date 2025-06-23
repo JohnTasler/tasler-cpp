@@ -13,10 +13,6 @@ namespace taz::ui
 	template<typename TDerived>
 	struct window_base
 	{
-		~window_base()
-		{
-
-		}
 		friend typename TDerived;
 
 		// Overridable methods
@@ -42,10 +38,10 @@ namespace taz::ui
 	protected:
 		void subclass_window(HWND hwnd);
 		void unsubclass_window(HWND hwnd);
-		static TDerived* from_hwnd(HWND hwnd)
+		static TDerived* from_hwnd(HWND hwnd, bool throwOnNull = true)
 		{
 			auto ptr = reinterpret_cast<TDerived*>(GetWindowLongPtrW(hwnd, GWLP_USERDATA));
-			if (!ptr)
+			if (!ptr && throwOnNull)
 				throw std::logic_error("The window is not subclassed or the user data is not set.");
 			return ptr;
 		}
@@ -59,7 +55,7 @@ namespace taz::ui
 		TDerived const& const_derived() const { return *static_cast<TDerived const*>(this); }
 
 	private:
-		static window_base* window_base_from_hwnd(HWND hwnd, bool noThrow = false);
+		static TDerived* window_base_from_hwnd(HWND hwnd, bool noThrow = false);
 		static LRESULT STDAPICALLTYPE window_proc_thunk(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 		LRESULT window_proc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 		void on_wm_setting_change(uint32_t parameterType, std::wstring_view sectionName);
@@ -73,21 +69,6 @@ namespace taz::ui
 	};
 
 	template<typename TDerived>
-	inline window_base<TDerived>* window_base<TDerived>::window_base_from_hwnd(HWND hwnd, bool noThrow)
-	{
-		auto ptr = reinterpret_cast<window_base*>(GetWindowLongPtrW(hwnd, GWLP_USERDATA));
-		if (!ptr && !noThrow)
-			throw std::logic_error("The window is not subclassed or the user data is not set.");
-		return ptr;
-	}
-
-	template<typename TDerived>
-	inline LRESULT STDAPICALLTYPE window_base<TDerived>::window_proc_thunk(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
-	{
-		return window_base_from_hwnd(hwnd)->window_proc(hwnd, message, wParam, lParam);
-	}
-
-	template<typename TDerived>
 	inline void window_base<TDerived>::subclass_window(HWND hwnd)
 	{
 		m_previousWindowProc = reinterpret_cast<WNDPROC>(GetWindowLongPtrW(hwnd, GWLP_WNDPROC));
@@ -95,7 +76,7 @@ namespace taz::ui
 			throw std::logic_error("The window is already subclassed.");
 
 		SetWindowLongPtrW(hwnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(window_proc_thunk));
-		SetWindowLongPtrW(hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
+		SetWindowLongPtrW(hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(&this->derived()));
 	}
 
 	template<typename TDerived>
@@ -126,6 +107,21 @@ namespace taz::ui
 	}
 
 	template<typename TDerived>
+	inline TDerived* window_base<TDerived>::window_base_from_hwnd(HWND hwnd, bool noThrow)
+	{
+		auto ptr = reinterpret_cast<TDerived*>(GetWindowLongPtrW(hwnd, GWLP_USERDATA));
+		if (!ptr && !noThrow)
+			throw std::logic_error("The window is not subclassed or the user data is not set.");
+		return ptr;
+	}
+
+	template<typename TDerived>
+	inline LRESULT STDAPICALLTYPE window_base<TDerived>::window_proc_thunk(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+	{
+		return from_hwnd(hwnd)->window_proc(hwnd, message, wParam, lParam);
+	}
+
+	template<typename TDerived>
 	inline LRESULT window_base<TDerived>::window_proc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 		if (auto result = derived().on_message(hwnd, message, wParam, lParam); result.has_value())
@@ -137,10 +133,10 @@ namespace taz::ui
 			derived().on_resized(static_cast<ResizeType>(wParam), LOWORD(lParam), HIWORD(lParam));
 			return 0;
 		case WM_SETTINGCHANGE:
-			on_wm_setting_change(static_cast<uint32_t>(wParam), reinterpret_cast<PCWSTR>(lParam));
+			this->derived().on_wm_setting_change(static_cast<uint32_t>(wParam), reinterpret_cast<PCWSTR>(lParam));
 			break;
 		case WM_NCHITTEST:
-			return on_wm_non_client_hit_test(lParam);
+			return this->derived().on_wm_non_client_hit_test(lParam);
 		case WM_CTLCOLORDLG:
 			return reinterpret_cast<LRESULT>(this->derived().get_background_brush());
 		case WM_ERASEBKGND:
@@ -150,14 +146,13 @@ namespace taz::ui
 		case WM_CLOSE:
 			if (this->derived().on_close())
 				DestroyWindow(hwnd);
-			EndDialog(hwnd, (INT_PTR)IDCANCEL + 3);
 			break;
 		case WM_DESTROY:
 			if (this->derived().is_main_application_window() && this->derived().on_destroy())
 				PostQuitMessage(0);
 			break;
 		case WM_COMMAND:
-			on_wm_command(wParam);
+			this->derived().on_wm_command(wParam);
 			return 0;
 		case WM_NOTIFY:
 			this->derived().on_notify(*reinterpret_cast<NMHDR*>(lParam), static_cast<uint16_t>(wParam));
@@ -166,7 +161,7 @@ namespace taz::ui
 			return NFR_UNICODE;
 		}
 
-		return m_previousWindowProc(hwnd, message, wParam, lParam);
+		return this->derived().m_previousWindowProc(hwnd, message, wParam, lParam);
 	}
 
 	template<typename TDerived>
