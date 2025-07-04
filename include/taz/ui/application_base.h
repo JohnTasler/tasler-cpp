@@ -19,7 +19,6 @@ namespace taz::ui
 		HWND get_console_window() const { return m_hwndConsole; }
 
 	public:
-		int run_message_loop(HWND hwnd);
 		void allocate_console(PCWSTR consoleTitle);
 		void free_console();
 
@@ -63,45 +62,6 @@ namespace taz::ui
 	inline application_base::~application_base()
 	{
 		s_current = nullptr;
-	}
-
-	inline int application_base::run_message_loop(HWND hwnd)
-	{
-		MSG message{};
-		BOOL result{};
-		while ((result = GetMessageW(&message, nullptr, 0, 0)) != 0)
-		{
-			if (result == -1)
-			{
-				auto lastError = GetLastError();
-				taz::debug.write_line("application_base::run_message_loop: GetMessageW: lastError={:08X}: {}",
-					lastError, taz::error_utility::get_last_error_message().c_str());
-				return -1; // Exit on error
-			}
-
-			try
-			{
-				if (!IsDialogMessageW(hwnd, &message))
-				{
-					TranslateMessage(&message);
-					DispatchMessageW(&message);
-				}
-			}
-			catch (std::exception const& ex)
-			{
-				taz::debug.write_line("application_base::run_message_loop: exception: what={}", ex.what());
-			}
-			catch (...)
-			{
-				taz::debug.write_line("application_base::run_message_loop: unknown exception: ");
-			}
-		}
-
-		taz::console_out.exit();
-		taz::console_err.exit();
-
-		auto messageResult = message.wParam;
-		return static_cast<int>(messageResult);
 	}
 
 	inline void application_base::allocate_console(PCWSTR consoleTitle)

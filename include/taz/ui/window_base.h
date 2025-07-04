@@ -1,6 +1,8 @@
 #pragma once
+#define WINVER 0x0A00
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#include <winuser.h>
 #include <stdexcept>
 #include <type_traits>
 #include "..\debug.h"
@@ -23,14 +25,14 @@ namespace taz::ui
 		void on_user_policy_setting_changed() {}
 		void on_machine_policy_setting_changed() {}
 		void on_system_parameter_setting_changed(uint32_t uiAction, std::wstring_view pszSection) {}
-		HBRUSH get_background_brush() const { return reinterpret_cast<HBRUSH>(GetStockObject(GRAY_BRUSH)); }
+		HBRUSH get_background_brush() const { return nullptr; }
 		uint16_t on_non_client_hit_test(int defaultCode, uint16_t cxScreen, uint16_t cyScreen);
 		bool on_erase_background(HDC hdc) { return false; };
 		bool on_closed() { return true; };
 		bool on_destroy() { return true; };
 		void on_menu_command(uint16_t commandID) {}
-		void on_accelerator_command(uint16_t commandID) {}
-		void on_control_command(uint16_t notificationCode, uint16_t controlID) {}
+		void on_accelerator_command(uint16_t commandID) { derived().on_menu_command(commandID); }
+		void on_control_command(uint16_t notificationCode, uint16_t controlID, HWND controlWindow) {}
 		void on_notify(NMHDR header, uint16_t controlID) {}
 		void initialize_and_show(HWND hwnd, bool isDialog);
 		HWND hwnd() const { return this->const_derived().m_hwnd; }
@@ -61,7 +63,7 @@ namespace taz::ui
 		void on_wm_setting_change(uint32_t parameterType, std::wstring_view sectionName);
 		int on_wm_non_client_hit_test(LPARAM lParam);
 		bool on_wm_erase_background(HDC hdc);
-		void on_wm_command(WPARAM wParam);
+		void on_wm_command(WPARAM wParam, LPARAM lParam);
 
 	protected:
 		HWND m_hwnd{};
@@ -152,7 +154,7 @@ namespace taz::ui
 				PostQuitMessage(0);
 			break;
 		case WM_COMMAND:
-			this->derived().on_wm_command(wParam);
+			this->derived().on_wm_command(wParam, lParam);
 			return 0;
 		case WM_NOTIFY:
 			this->derived().on_notify(*reinterpret_cast<NMHDR*>(lParam), static_cast<uint16_t>(wParam));
@@ -198,11 +200,11 @@ namespace taz::ui
 	}
 
 	template<typename TDerived>
-	inline void window_base<TDerived>::on_wm_command(WPARAM wParam)
+	inline void window_base<TDerived>::on_wm_command(WPARAM wParam, LPARAM lParam)
 	{
 		uint16_t commandID = LOWORD(wParam);
 		uint16_t notificationCode = HIWORD(wParam);
-		if (notificationCode == 0)
+		if (notificationCode == 0 && !lParam)
 		{
 			// Menu command
 			this->derived().on_menu_command(commandID);
@@ -215,7 +217,7 @@ namespace taz::ui
 		else
 		{
 			// Control command
-			this->derived().on_control_command(notificationCode, commandID);
+			this->derived().on_control_command(notificationCode, commandID, reinterpret_cast<HWND>(lParam));
 		}
 	}
 }
