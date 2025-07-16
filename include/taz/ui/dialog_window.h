@@ -44,7 +44,6 @@ namespace taz::ui
 		dialog_window& operator=(const dialog_window&) = delete;
 		dialog_window& operator=(dialog_window&&) = delete;
 
-		static dialog_window* dialog_window_from_hwnd(HWND hwnd, bool noThrow = false);
 		static INT_PTR CALLBACK dialog_proc_thunk(HWND, UINT, WPARAM, LPARAM);
 		INT_PTR dialog_proc(HWND, UINT, WPARAM, LPARAM);
 		bool on_wm_init_dialog(HWND hwndFocusControl, LPARAM parameter);
@@ -192,15 +191,6 @@ namespace taz::ui
 		}
 	}
 
-	template<typename TDerived>
-	inline dialog_window<TDerived>* dialog_window<TDerived>::dialog_window_from_hwnd(HWND hwnd, bool noThrow)
-	{
-		auto ptr = reinterpret_cast<dialog_window*>(GetWindowLongPtrW(hwnd, GWLP_USERDATA));
-		if (!ptr && !noThrow)
-			throw std::logic_error("The dialog window is not subclassed or the user data is not set.");
-		return ptr;
-	}
-
 	// Dialog procedure for main window dialog box
 	template<typename TDerived>
 	inline INT_PTR CALLBACK dialog_window<TDerived>::dialog_proc_thunk(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -208,7 +198,7 @@ namespace taz::ui
 		// If this is the initialization message, we need to set the user data
 		if (message == WM_INITDIALOG && lParam)
 		{
-			SetWindowLongPtrW(hwnd, GWLP_USERDATA, lParam);
+			SetWindowSubclass(hwnd, window_base<TDerived>::subclass_proc, 0, lParam);
 		}
 
 		if (auto& that = *dialog_window<TDerived>::from_hwnd(hwnd, false); &that)

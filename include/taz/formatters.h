@@ -32,6 +32,14 @@ namespace taz::details
 		return className;
 	}
 
+	inline std::wstring GetWindowClassNameStringW(HWND hwnd)
+	{
+		std::wstring className(256, L'\0');
+		auto classNameLength = GetClassNameW(hwnd, className.data(), static_cast<int32_t>(className.size()));
+		className.resize(classNameLength);
+		return className;
+	}
+
 	template <std::convertible_to<const wchar_t*> _Ty>
 	struct wide_to_narrow_formatter
 	{

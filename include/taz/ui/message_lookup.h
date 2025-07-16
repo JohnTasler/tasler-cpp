@@ -13,12 +13,12 @@ using namespace std::literals;
 
 namespace taz::ui::message_lookup
 {
-#define WM_UAHDESTROYWINDOW    0x0090
-#define WM_UAHDRAWMENU         0x0091
-#define WM_UAHDRAWMENUITEM     0x0092
-#define WM_UAHINITMENU         0x0093
-#define WM_UAHMEASUREMENUITEM  0x0094
-#define WM_UAHNCPAINTMENUPOPUP 0x0095
+	constexpr uint16_t WM_UAHDESTROYWINDOW    = 0x0090;
+	constexpr uint16_t WM_UAHDRAWMENU         = 0x0091;
+	constexpr uint16_t WM_UAHDRAWMENUITEM     = 0x0092;
+	constexpr uint16_t WM_UAHINITMENU         = 0x0093;
+	constexpr uint16_t WM_UAHMEASUREMENUITEM  = 0x0094;
+	constexpr uint16_t WM_UAHNCPAINTMENUPOPUP = 0x0095;
 
 	constexpr std::pair<uint16_t, std::wstring_view> message_map[] =
 	{
@@ -313,5 +313,88 @@ namespace taz::ui::message_lookup
 			return messageString = std::format(L"WM_APP + {} (0x{:04X})"sv, message - WM_APP, message);
 
 		return messageString = std::format(L"Unknown message (0x{:04X})"sv, message);
+	}
+
+	constexpr std::pair<uint16_t, std::wstring_view> edit_control_message_map[] =
+	{
+		{ EM_GETSEL             , L"EM_GETSEL"sv              },
+		{ EM_SETSEL             , L"EM_SETSEL"sv              },
+		{ EM_GETRECT            , L"EM_GETRECT"sv             },
+		{ EM_SETRECT            , L"EM_SETRECT"sv             },
+		{ EM_SETRECTNP          , L"EM_SETRECTNP"sv           },
+		{ EM_SCROLL             , L"EM_SCROLL"sv              },
+		{ EM_LINESCROLL         , L"EM_LINESCROLL"sv          },
+		{ EM_SCROLLCARET        , L"EM_SCROLLCARET"sv         },
+		{ EM_GETMODIFY          , L"EM_GETMODIFY"sv           },
+		{ EM_SETMODIFY          , L"EM_SETMODIFY"sv           },
+		{ EM_GETLINECOUNT       , L"EM_GETLINECOUNT"sv        },
+		{ EM_LINEINDEX          , L"EM_LINEINDEX"sv           },
+		{ EM_SETHANDLE          , L"EM_SETHANDLE"sv           },
+		{ EM_GETHANDLE          , L"EM_GETHANDLE"sv           },
+		{ EM_GETTHUMB           , L"EM_GETTHUMB"sv            },
+		{ EM_LINELENGTH         , L"EM_LINELENGTH"sv          },
+		{ EM_REPLACESEL         , L"EM_REPLACESEL"sv          },
+		{ EM_GETLINE            , L"EM_GETLINE"sv             },
+		{ EM_SETLIMITTEXT       , L"EM_SETLIMITTEXT"sv        },
+		{ EM_CANUNDO            , L"EM_CANUNDO"sv             },
+		{ EM_UNDO               , L"EM_UNDO"sv                },
+		{ EM_FMTLINES           , L"EM_FMTLINES"sv            },
+		{ EM_LINEFROMCHAR       , L"EM_LINEFROMCHAR"sv        },
+		{ EM_SETTABSTOPS        , L"EM_SETTABSTOPS"sv         },
+		{ EM_SETPASSWORDCHAR    , L"EM_SETPASSWORDCHAR"sv     },
+		{ EM_EMPTYUNDOBUFFER    , L"EM_EMPTYUNDOBUFFER"sv     },
+		{ EM_GETFIRSTVISIBLELINE, L"EM_GETFIRSTVISIBLELINE"sv },
+		{ EM_SETREADONLY        , L"EM_SETREADONLY"sv         },
+		{ EM_SETWORDBREAKPROC   , L"EM_SETWORDBREAKPROC"sv    },
+		{ EM_GETWORDBREAKPROC   , L"EM_GETWORDBREAKPROC"sv    },
+		{ EM_GETPASSWORDCHAR    , L"EM_GETPASSWORDCHAR"sv     },
+		{ EM_SETMARGINS         , L"EM_SETMARGINS"sv          },
+		{ EM_GETMARGINS         , L"EM_GETMARGINS"sv          },
+		{ EM_GETLIMITTEXT       , L"EM_GETLIMITTEXT"sv        },
+		{ EM_POSFROMCHAR        , L"EM_POSFROMCHAR"sv         },
+		{ EM_CHARFROMPOS        , L"EM_CHARFROMPOS"sv         },
+		{ EM_SETIMESTATUS       , L"EM_SETIMESTATUS"sv        },
+		{ EM_GETIMESTATUS       , L"EM_GETIMESTATUS"sv        },
+		{ EM_ENABLEFEATURE      , L"EM_ENABLEFEATURE"sv       },
+	};
+
+	inline std::wstring_view get_edit_control_message_name(uint16_t message)
+	{
+		// Use a binary search for great performance, but array must remain in order by message ID
+		auto lower_bound = std::lower_bound(std::begin(edit_control_message_map), std::end(edit_control_message_map), message,
+			[](const auto& pair, uint16_t msg) { return pair.first < msg; });
+		if (lower_bound != std::end(edit_control_message_map) && lower_bound->first == message)
+			return lower_bound->second;
+
+		thread_local std::wstring messageString;
+		return messageString = get_name(message);
+	}
+
+	constexpr std::pair<uint16_t, std::wstring_view> edit_control_notification_map[] =
+	{
+		{ EN_SETFOCUS     , L"EN_SETFOCUS"sv     },
+		{ EN_KILLFOCUS    , L"EN_KILLFOCUS"sv    },
+		{ EN_CHANGE       , L"EN_CHANGE"sv       },
+		{ EN_UPDATE       , L"EN_UPDATE"sv       },
+		{ EN_ERRSPACE     , L"EN_ERRSPACE"sv     },
+		{ EN_MAXTEXT      , L"EN_MAXTEXT"sv      },
+		{ EN_HSCROLL      , L"EN_HSCROLL"sv      },
+		{ EN_VSCROLL      , L"EN_VSCROLL"sv      },
+		{ EN_ALIGN_LTR_EC , L"EN_ALIGN_LTR_EC"sv },
+		{ EN_ALIGN_RTL_EC , L"EN_ALIGN_RTL_EC"sv },
+		{ EN_BEFORE_PASTE , L"EN_BEFORE_PASTE"sv },
+		{ EN_AFTER_PASTE  , L"EN_AFTER_PASTE"sv  },
+	};
+
+	inline std::wstring_view get_edit_control_notification_name(uint16_t notification)
+	{
+		// Use a binary search for great performance, but array must remain in order by notification ID
+		auto lower_bound = std::lower_bound(std::begin(edit_control_notification_map), std::end(edit_control_notification_map), notification,
+			[](const auto& pair, uint16_t msg) { return pair.first < msg; });
+		if (lower_bound != std::end(edit_control_notification_map) && lower_bound->first == notification)
+			return lower_bound->second;
+
+		thread_local std::wstring notificationString;
+		return notificationString = std::format(L"Unknown notification (0x{:04X})"sv, notification);
 	}
 }

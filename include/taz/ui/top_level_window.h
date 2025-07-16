@@ -14,7 +14,6 @@ namespace taz::ui
 		top_level_window()
 		{
 			static_assert(std::is_base_of_v<window_base<TDerived>, TDerived>, "TDerived must inherit from window_base");
-			this->subclass_window(this->hwnd());
 		}
 		top_level_window(HWND hwnd)
 		{
