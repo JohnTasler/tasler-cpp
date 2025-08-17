@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	<ItemGroup>
+		<ClInclude Include="$(MSBuildThisFileDirectory)taz\debug.h">
+			<Filter>taz</Filter>
+		</ClInclude>
+		<ClInclude Include="$(MSBuildThisFileDirectory)taz\environment_utility.h">
+			<Filter>taz</Filter>
+		</ClInclude>
+		<ClInclude Include="$(MSBuildThisFileDirectory)taz\formatters.h">
+			<Filter>taz</Filter>
+		</ClInclude>
+		<ClInclude Include="$(MSBuildThisFileDirectory)taz\resource_loader.h">
+			<Filter>taz</Filter>
+		</ClInclude>
+		<ClInclude Include="$(MSBuildThisFileDirectory)taz\string_utility.h">
+			<Filter>taz</Filter>
+		</ClInclude>
+		<ClInclude Include="$(MSBuildThisFileDirectory)taz\window_enumeration.h">
+			<Filter>taz</Filter>
+		</ClInclude>
+		<ClInclude Include="$(MSBuildThisFileDirectory)taz\ui\application.h" />
+		<ClInclude Include="$(MSBuildThisFileDirectory)taz\ui\application_base.h">
+			<Filter>taz\ui</Filter>
+		</ClInclude>
+		<ClInclude Include="$(MSBuildThisFileDirectory)taz\ui\dialog_window.h">
+			<Filter>taz\ui</Filter>
+		</ClInclude>
+		<ClInclude Include="$(MSBuildThisFileDirectory)taz\console.h">
+			<Filter>taz</Filter>
+		</ClInclude>
+		<ClInclude Include="$(MSBuildThisFileDirectory)taz\error_utility.h">
+			<Filter>taz</Filter>
+		</ClInclude>
+		<ClInclude Include="$(MSBuildThisFileDirectory)taz\logger.h">
+			<Filter>taz</Filter>
+		</ClInclude>
+		<ClInclude Include="$(MSBuildThisFileDirectory)taz\thread_queue.h">
+			<Filter>taz</Filter>
+		</ClInclude>
+		<ClInclude Include="$(MSBuildThisFileDirectory)taz\ui\application.h">
+			<Filter>taz\ui</Filter>
+		</ClInclude>
+		<ClInclude Include="$(MSBuildThisFileDirectory)taz\ui\window_base.h">
+			<Filter>taz\ui</Filter>
+		</ClInclude>
+		<ClInclude Include="$(MSBuildThisFileDirectory)taz\ui\top_level_window.h">
+			<Filter>taz\ui</Filter>
+		</ClInclude>
+		<ClInclude Include="$(MSBuildThisFileDirectory)taz\ui\resize_type.h">
+			<Filter>taz\ui</Filter>
+		</ClInclude>
+		<ClInclude Include="$(MSBuildThisFileDirectory)taz\ui\message_lookup.h">
+			<Filter>taz\ui</Filter>
+		</ClInclude>
+		<ClInclude Include="$(MSBuildThisFileDirectory)taz\ui\application.h">
+			<Filter>taz</Filter>
+		</ClInclude>
+	</ItemGroup>
+	<ItemGroup>
+		<Filter Include="build">
+			<UniqueIdentifier>{A89A485B-2C76-4353-8219-EE6AB3595A9F}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="taz">
+			<UniqueIdentifier>{959b652c-e0a1-4e0c-9a7a-b16240094dd1}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="taz\ui">
+			<UniqueIdentifier>{73fe03e3-4d0b-498e-9a8f-92c8853d77e6}</UniqueIdentifier>
+		</Filter>
+	</ItemGroup>
+	<ItemGroup>
+		<None Include="$(MSBuildThisFileDirectory)build\ProjectConfigurations.props">
+			<Filter>build</Filter>
+		</None>
+		<None Include="$(MSBuildThisFileDirectory)build\OutputAndIntermediateDirs.props">
+			<Filter>build</Filter>
+		</None>
+	</ItemGroup>
+</Project>
