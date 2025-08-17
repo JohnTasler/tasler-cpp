@@ -19,7 +19,6 @@
 		<ClInclude Include="$(MSBuildThisFileDirectory)taz\window_enumeration.h">
 			<Filter>taz</Filter>
 		</ClInclude>
-		<ClInclude Include="$(MSBuildThisFileDirectory)taz\ui\application.h" />
 		<ClInclude Include="$(MSBuildThisFileDirectory)taz\ui\application_base.h">
 			<Filter>taz\ui</Filter>
 		</ClInclude>
@@ -52,6 +51,9 @@
 		</ClInclude>
 		<ClInclude Include="$(MSBuildThisFileDirectory)taz\ui\message_lookup.h">
 			<Filter>taz\ui</Filter>
+		</ClInclude>
+		<ClInclude Include="$(MSBuildThisFileDirectory)taz\ui\application.h">
+			<Filter>taz</Filter>
 		</ClInclude>
 		<ClInclude Include="$(MSBuildThisFileDirectory)taz\ui\application.h">
 			<Filter>taz</Filter>
