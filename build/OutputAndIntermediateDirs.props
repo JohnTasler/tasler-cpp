@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Note that this file should be imported from your C++ project after importing both of these projects:
+	<Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+	<Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+-->
+<Project>
+	<PropertyGroup>
+		<OutDir>$(ProjectDir)bin\$(PlatformTarget)\$(Configuration)\</OutDir>
+		<IntDir>$(ProjectDir)obj\$(PlatformTarget)\$(Configuration)\</IntDir>
+		<GeneratedFilesDir>$(IntDir)GeneratedFiles\</GeneratedFilesDir>
+		<ExternalIncludePath>$(ExternalIncludePath);$(GeneratedFilesDir)</ExternalIncludePath>
+	</PropertyGroup>
+</Project>
