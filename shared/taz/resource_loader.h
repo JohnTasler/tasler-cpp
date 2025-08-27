@@ -15,7 +15,7 @@ namespace taz
 {
 	namespace details
 	{
-		inline void* find_and_load_core(HMODULE module, PCWSTR id, PCWSTR type, uint16_t /*lang*/, _Out_ uint32_t* byteCount)
+		inline void* find_and_load_core(HMODULE module, PCWSTR id, PCWSTR type, uint16_t /*lang*/, _Out_opt_ uint32_t* byteCount)
 		{
 			auto resourceInformationBlock = ::FindResourceW(module, id, type);
 			THROW_LAST_ERROR_IF_NULL(resourceInformationBlock);
@@ -46,15 +46,15 @@ namespace taz
 			static_assert("T is a non-supported type.");
 		}
 
-		//template<> inline static std::span<uint8_t> find_and_load(HMODULE module, PCWSTR id, PCWSTR type)
+		//template<> static std::span<uint8_t> find_and_load(HMODULE module, PCWSTR id, PCWSTR type)
 		//{
-		//    uint32_t byteCount{};
-		//    const void* data = details::find_and_load_core(module, id, type, 0, &byteCount);
-		//    const auto begin = reinterpret_cast<const uint8_t*>(data);
-		//    return std::span<uint8_t>(begin, begin + byteCount);
+		//		uint32_t byteCount{};
+		//		const void* data = details::find_and_load_core(module, id, type, 0, &byteCount);
+		//		const auto begin = reinterpret_cast<const uint8_t*>(data);
+		//		return std::span<uint8_t>(begin, begin + byteCount);
 		//}
 
-		template<> inline static std::string_view find_and_load(HMODULE module, PCWSTR id, PCWSTR type)
+		template<> std::string_view find_and_load(HMODULE module, PCWSTR id, PCWSTR type)
 		{
 			uint32_t byteCount{};
 			const void* data = details::find_and_load_core(module, id, type, 0, &byteCount);
@@ -62,7 +62,7 @@ namespace taz
 			return { begin, byteCount };
 		}
 
-		template<> inline static std::wstring_view find_and_load(HMODULE module, PCWSTR id, PCWSTR type)
+		template<> std::wstring_view find_and_load(HMODULE module, PCWSTR id, PCWSTR type)
 		{
 			uint32_t byteCount{};
 			const void* data = details::find_and_load_core(module, id, type, 0, &byteCount);
@@ -75,15 +75,15 @@ namespace taz
 		{
 			static_assert("T is a non-supported type.");
 		}
-		//template<> inline static std::span<uint8_t> find_and_load(HMODULE module, uint16_t id, PCWSTR type)
+		//template<> std::span<uint8_t> find_and_load(HMODULE module, uint16_t id, PCWSTR type)
 		//{
 		//    return find_and_load<std::span<uint8_t>>(module, MAKEINTRESOURCE(id), type);
 		//}
-		template<> inline static std::string_view find_and_load(HMODULE module, uint16_t id, PCWSTR type)
+		template<> std::string_view find_and_load(HMODULE module, uint16_t id, PCWSTR type)
 		{
 			return find_and_load<std::string_view>(module, MAKEINTRESOURCE(id), type);
 		}
-		template<> inline static std::wstring_view find_and_load(HMODULE module, uint16_t id, PCWSTR type)
+		template<> std::wstring_view find_and_load(HMODULE module, uint16_t id, PCWSTR type)
 		{
 			return find_and_load<std::wstring_view>(module, MAKEINTRESOURCE(id), type);
 		}
@@ -93,15 +93,15 @@ namespace taz
 		{
 			static_assert("T is a non-supported type.");
 		}
-		//template<> inline static std::span<uint8_t> find_and_load(HMODULE module, uint16_t id, uint16_t type)
+		//template<> std::span<uint8_t> find_and_load(HMODULE module, uint16_t id, uint16_t type)
 		//{
-		//    return find_and_load<std::span<uint8_t>>(module, MAKEINTRESOURCE(id), MAKEINTRESOURCE(type));
+		//		return find_and_load<std::span<uint8_t>>(module, MAKEINTRESOURCE(id), MAKEINTRESOURCE(type));
 		//}
-		template<> inline static std::string_view find_and_load(HMODULE module, uint16_t id, uint16_t type)
+		template<> std::string_view find_and_load(HMODULE module, uint16_t id, uint16_t type)
 		{
 			return find_and_load<std::string_view>(module, MAKEINTRESOURCE(id), MAKEINTRESOURCE(type));
 		}
-		template<> inline static std::wstring_view find_and_load(HMODULE module, uint16_t id, uint16_t type)
+		template<> std::wstring_view find_and_load(HMODULE module, uint16_t id, uint16_t type)
 		{
 			return find_and_load<std::wstring_view>(module, MAKEINTRESOURCE(id), MAKEINTRESOURCE(type));
 		}
@@ -111,20 +111,20 @@ namespace taz
 		{
 			static_assert("T is a non-supported type.");
 		}
-		//template<> inline static std::span<uint8_t> find_and_load(HMODULE module, PCWSTR id, uint16_t type)
+		//template<> std::span<uint8_t> find_and_load(HMODULE module, PCWSTR id, uint16_t type)
 		//{
-		//    return find_and_load<std::span<uint8_t>>(module, id, MAKEINTRESOURCE(type));
+		//		return find_and_load<std::span<uint8_t>>(module, id, MAKEINTRESOURCE(type));
 		//}
-		template<> inline static std::string_view find_and_load(HMODULE module, PCWSTR id, uint16_t type)
+		template<> std::string_view find_and_load(HMODULE module, PCWSTR id, uint16_t type)
 		{
 			return find_and_load<std::string_view>(module, id, MAKEINTRESOURCE(type));
 		}
-		template<> inline static std::wstring_view find_and_load(HMODULE module, PCWSTR id, uint16_t type)
+		template<> std::wstring_view find_and_load(HMODULE module, PCWSTR id, uint16_t type)
 		{
 			return find_and_load<std::wstring_view>(module, id, MAKEINTRESOURCE(type));
 		}
 
-		inline static std::wstring_view load_string(HMODULE module, uint16_t id)
+		inline std::wstring_view load_string(HMODULE module, uint16_t id) const
 		{
 			wchar_t* bufferAddress{};
 
@@ -161,81 +161,81 @@ namespace taz
 
 		#pragma region instance methods
 		template<typename T>
-		T find_and_load(PCWSTR id, PCWSTR type)
+		T find_and_load(PCWSTR id, PCWSTR type) const
 		{
 			static_assert("T is a non-supported type.");
 		}
 
-		//template<> inline std::span<uint8_t> find_and_load(PCWSTR id, PCWSTR type)
+		//template<> std::span<uint8_t> find_and_load(PCWSTR id, PCWSTR type) const
 		//{
 		//	return std::span<uint8_t> find_and_load(m_module, id, type);
 		//}
 
-		template<> inline std::string_view find_and_load(PCWSTR id, PCWSTR type)
+		template<> std::string_view find_and_load(PCWSTR id, PCWSTR type) const
 		{
 			return find_and_load<std::string_view>(m_module, id, type);
 		}
 
-		template<> inline std::wstring_view find_and_load(PCWSTR id, PCWSTR type)
+		template<> std::wstring_view find_and_load(PCWSTR id, PCWSTR type) const
 		{
 			return find_and_load<std::wstring_view>(m_module, id, type);
 		}
 
 		template<typename T>
-		T find_and_load(uint16_t id, PCWSTR type)
+		T find_and_load(uint16_t id, PCWSTR type) const
 		{
 			static_assert("T is a non-supported type.");
 		}
-		//template<> inline std::span<uint8_t> find_and_load(uint16_t id, PCWSTR type)
+		//template<> std::span<uint8_t> find_and_load(uint16_t id, PCWSTR type) const
 		//{
 		//	return std::span<uint8_t> find_and_load(m_module, id, type);
 		//}
-		template<> inline std::string_view find_and_load(uint16_t id, PCWSTR type)
+		template<> std::string_view find_and_load(uint16_t id, PCWSTR type) const
 		{
 			return find_and_load<std::string_view>(m_module, id, type);
 		}
-		template<> inline std::wstring_view find_and_load(uint16_t id, PCWSTR type)
+		template<> std::wstring_view find_and_load(uint16_t id, PCWSTR type) const
 		{
 			return find_and_load<std::wstring_view>(m_module, id, type);
 		}
 
 		template<typename T>
-		T find_and_load(uint16_t id, uint16_t type)
+		T find_and_load(uint16_t id, uint16_t type) const
 		{
 			static_assert("T is a non-supported type.");
 		}
-		//template<> inline std::span<uint8_t> find_and_load(uint16_t id, uint16_t type)
+		//template<> std::span<uint8_t> find_and_load(uint16_t id, uint16_t type) const
 		//{
 		//	return std::span<uint8_t> find_and_load(m_module, id, type);
 		//}
-		template<> inline std::string_view find_and_load(uint16_t id, uint16_t type)
+		template<> std::string_view find_and_load(uint16_t id, uint16_t type) const
 		{
 			return find_and_load<std::string_view>(m_module, id, type);
 		}
-		template<> inline std::wstring_view find_and_load(uint16_t id, uint16_t type)
+		template<> std::wstring_view find_and_load(uint16_t id, uint16_t type) const
 		{
 			return find_and_load<std::wstring_view>(m_module, id, type);
 		}
 
 		template<typename T>
-		T find_and_load(PCWSTR id, uint16_t type)
+		T find_and_load(PCWSTR id, uint16_t type) const
 		{
 			static_assert("T is a non-supported type.");
 		}
-		//template<> inline std::span<uint8_t> find_and_load(PCWSTR id, uint16_t type)
+		//template<> std::span<uint8_t> find_and_load(PCWSTR id, uint16_t type) const
 		//{
 		//	return std::span<uint8_t> find_and_load(m_module, id, type);
 		//}
-		template<> inline std::string_view find_and_load(PCWSTR id, uint16_t type)
+		template<> std::string_view find_and_load(PCWSTR id, uint16_t type) const
 		{
 			return find_and_load<std::string_view>(m_module, id, type);
 		}
-		template<> inline std::wstring_view find_and_load(PCWSTR id, uint16_t type)
+		template<> std::wstring_view find_and_load(PCWSTR id, uint16_t type) const
 		{
 			return find_and_load<std::wstring_view>(m_module, id, type);
 		}
 
-		inline std::wstring_view load_string(uint16_t id)
+		inline std::wstring_view load_string(uint16_t id) const
 		{
 			return load_string(m_module, id);
 		}

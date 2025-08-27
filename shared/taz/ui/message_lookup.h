@@ -20,6 +20,7 @@ namespace taz::ui::message_lookup
 	constexpr uint16_t WM_UAHMEASUREMENUITEM  = 0x0094;
 	constexpr uint16_t WM_UAHNCPAINTMENUPOPUP = 0x0095;
 
+	// This array must remain in order by message ID
 	constexpr std::pair<uint16_t, std::wstring_view> message_map[] =
 	{
 		{ WM_NULL                            , L"WM_NULL"sv                           },
@@ -315,6 +316,7 @@ namespace taz::ui::message_lookup
 		return messageString = std::format(L"Unknown message (0x{:04X})"sv, message);
 	}
 
+// This array must remain in order by message ID
 	constexpr std::pair<uint16_t, std::wstring_view> edit_control_message_map[] =
 	{
 		{ EM_GETSEL             , L"EM_GETSEL"sv              },
@@ -370,6 +372,7 @@ namespace taz::ui::message_lookup
 		return messageString = get_name(message);
 	}
 
+	// This array must remain in order by message ID
 	constexpr std::pair<uint16_t, std::wstring_view> edit_control_notification_map[] =
 	{
 		{ EN_SETFOCUS     , L"EN_SETFOCUS"sv     },

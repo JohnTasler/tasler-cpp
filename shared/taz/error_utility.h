@@ -12,17 +12,17 @@
 
 namespace taz::error_utility
 {
-    [[nodiscard]]
-    inline std::wstring get_system_error_message(DWORD messageId)
-    {
-        wil::unique_hlocal_string message;
-        auto size = FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER, nullptr, messageId, 0, reinterpret_cast<PWSTR>(&message), 0, nullptr);
-        return message.get();
-    }
+	[[nodiscard]]
+	inline std::wstring get_system_error_message(DWORD messageId)
+	{
+		wil::unique_hlocal_string message;
+		auto size = FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER, nullptr, messageId, 0, reinterpret_cast<PWSTR>(&message), 0, nullptr);
+		return message.get();
+	}
 
-    [[nodiscard]]
-    inline std::wstring get_last_error_message()
-    {
-        return get_system_error_message(GetLastError());
-    }
+	[[nodiscard]]
+	inline std::wstring get_last_error_message()
+	{
+		return get_system_error_message(GetLastError());
+	}
 }
