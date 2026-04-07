@@ -1,7 +1,11 @@
 #pragma once
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+
 #include <type_traits>
+
+#include <taz/debug.h>
+
 #include "application_base.h"
 #include "..\error_utility.h"
 
@@ -80,7 +84,11 @@ namespace taz::ui
 
 			try
 			{
-				if (derived().get_accelerator() && !TranslateAcceleratorW(hwnd, derived().get_accelerator(), &message))
+				if (auto haccel = derived().get_accelerator(); haccel && !TranslateAcceleratorW(hwnd, haccel, &message))
+				{
+					DispatchMessageW(&message);
+				}
+				else
 				{
 					if (!IsDialogMessageW(hwnd, &message))
 					{

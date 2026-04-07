@@ -1,13 +1,17 @@
 #pragma once
 
 // Windows headers
+#include <sal.h>
 #include <wtypes.h>
 
 // Standard C++ headers
+#include <cstdint>
 #include <string_view>
 
 // WIL headers
 #include <wil/result.h>
+#include <wil/result_macros.h>
+#include <Windows.h>
 
 using namespace std::literals;
 
@@ -54,7 +58,7 @@ namespace taz
 		//		return std::span<uint8_t>(begin, begin + byteCount);
 		//}
 
-		template<> std::string_view find_and_load(HMODULE module, PCWSTR id, PCWSTR type)
+		template<> static std::string_view find_and_load(HMODULE module, PCWSTR id, PCWSTR type)
 		{
 			uint32_t byteCount{};
 			const void* data = details::find_and_load_core(module, id, type, 0, &byteCount);
@@ -62,7 +66,7 @@ namespace taz
 			return { begin, byteCount };
 		}
 
-		template<> std::wstring_view find_and_load(HMODULE module, PCWSTR id, PCWSTR type)
+		template<> static std::wstring_view find_and_load(HMODULE module, PCWSTR id, PCWSTR type)
 		{
 			uint32_t byteCount{};
 			const void* data = details::find_and_load_core(module, id, type, 0, &byteCount);
@@ -79,11 +83,11 @@ namespace taz
 		//{
 		//    return find_and_load<std::span<uint8_t>>(module, MAKEINTRESOURCE(id), type);
 		//}
-		template<> std::string_view find_and_load(HMODULE module, uint16_t id, PCWSTR type)
+		template<> static std::string_view find_and_load(HMODULE module, uint16_t id, PCWSTR type)
 		{
 			return find_and_load<std::string_view>(module, MAKEINTRESOURCE(id), type);
 		}
-		template<> std::wstring_view find_and_load(HMODULE module, uint16_t id, PCWSTR type)
+		template<> static std::wstring_view find_and_load(HMODULE module, uint16_t id, PCWSTR type)
 		{
 			return find_and_load<std::wstring_view>(module, MAKEINTRESOURCE(id), type);
 		}
@@ -93,15 +97,15 @@ namespace taz
 		{
 			static_assert("T is a non-supported type.");
 		}
-		//template<> std::span<uint8_t> find_and_load(HMODULE module, uint16_t id, uint16_t type)
+		//template<> static std::span<uint8_t> find_and_load(HMODULE module, uint16_t id, uint16_t type)
 		//{
 		//		return find_and_load<std::span<uint8_t>>(module, MAKEINTRESOURCE(id), MAKEINTRESOURCE(type));
 		//}
-		template<> std::string_view find_and_load(HMODULE module, uint16_t id, uint16_t type)
+		template<> static std::string_view find_and_load(HMODULE module, uint16_t id, uint16_t type)
 		{
 			return find_and_load<std::string_view>(module, MAKEINTRESOURCE(id), MAKEINTRESOURCE(type));
 		}
-		template<> std::wstring_view find_and_load(HMODULE module, uint16_t id, uint16_t type)
+		template<> static std::wstring_view find_and_load(HMODULE module, uint16_t id, uint16_t type)
 		{
 			return find_and_load<std::wstring_view>(module, MAKEINTRESOURCE(id), MAKEINTRESOURCE(type));
 		}
@@ -111,20 +115,20 @@ namespace taz
 		{
 			static_assert("T is a non-supported type.");
 		}
-		//template<> std::span<uint8_t> find_and_load(HMODULE module, PCWSTR id, uint16_t type)
+		//template<> static std::span<uint8_t> find_and_load(HMODULE module, PCWSTR id, uint16_t type)
 		//{
 		//		return find_and_load<std::span<uint8_t>>(module, id, MAKEINTRESOURCE(type));
 		//}
-		template<> std::string_view find_and_load(HMODULE module, PCWSTR id, uint16_t type)
+		template<> static std::string_view find_and_load(HMODULE module, PCWSTR id, uint16_t type)
 		{
 			return find_and_load<std::string_view>(module, id, MAKEINTRESOURCE(type));
 		}
-		template<> std::wstring_view find_and_load(HMODULE module, PCWSTR id, uint16_t type)
+		template<> static std::wstring_view find_and_load(HMODULE module, PCWSTR id, uint16_t type)
 		{
 			return find_and_load<std::wstring_view>(module, id, MAKEINTRESOURCE(type));
 		}
 
-		inline std::wstring_view load_string(HMODULE module, uint16_t id) const
+		inline static std::wstring_view load_string(HMODULE module, uint16_t id)
 		{
 			wchar_t* bufferAddress{};
 

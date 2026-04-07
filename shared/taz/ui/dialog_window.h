@@ -1,13 +1,20 @@
 #pragma once
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#include <cinttypes>
+
+#include <cstdint>
 #include <optional>
 #include <type_traits>
+
+#include <taz/debug.h>
+#include <taz/console.h>
+
 #include "application.h"
 #include "message_lookup.h"
 #include "top_level_window.h"
 #include "window_base.h"
+#include "resize_type.h"
+#include "application_base.h"
 
 namespace taz::ui
 {

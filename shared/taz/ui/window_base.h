@@ -1,10 +1,18 @@
 #pragma once
+#if !defined(WINVER)
 #define WINVER 0x0A00
+#endif
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <winuser.h>
+
+#include <algorithm>
+#include <cctype>
+#include <cstdint>
+#include <optional>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 #include <type_traits>
 #include "..\console.h"
 #include "..\debug.h"
